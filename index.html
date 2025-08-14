@@ -68,7 +68,7 @@
 </div>
 
 <script>
-const members = ["교규먀", "공주", "상준", "쿙냐뮬", "바위게", "젬미니"];
+const members = ["교규먀", "공주", "상준", "쿙냐뮬", "바위게", "젬미니", "윤개", "여신", "주디"];
 const buttonsContainer = document.getElementById("buttons");
 
 // 버튼 랜덤 배치
@@ -88,8 +88,8 @@ renderButtons();
 
 // 팀 고정 규칙
 function getTeam(name) {
- // if (name === "교규먀" || name === "공주") return "불사조팀";
- // if (name === "상준" || name === "쿙냐뮬") return "청룡팀";
+  if (name === "교규먀" || name === "공주") return "불사조팀";
+  if (name === "상준" || name === "쿙냐뮬") return "청룡팀";
   return Math.random() < 0.5 ? "불사조팀" : "청룡팀";
 }
 
