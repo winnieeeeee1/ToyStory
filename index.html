@@ -3,123 +3,124 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>팀 배정 게임</title>
+<title>팀 배정</title>
 <style>
   body {
     font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #f9f9f9, #dfe9f3);
+    background-color: #fefefe;
     margin: 0;
-    padding: 0;
-    height: 100vh;
     display: flex;
-    align-items: center;
     justify-content: center;
-  }
-  .container {
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
     text-align: center;
-    width: 90%;
-    max-width: 400px;
   }
   h1 {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     margin-bottom: 20px;
   }
-  .button-grid {
+  .buttons {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    gap: 10px;
+    width: 80%;
+    max-width: 400px;
   }
   button {
-    padding: 12px;
+    padding: 15px;
     font-size: 1rem;
     border: none;
-    border-radius: 8px;
-    background-color: #4e73df;
+    background-color: #4CAF50;
     color: white;
+    border-radius: 8px;
     cursor: pointer;
-    transition: transform 0.2s ease, background-color 0.2s ease;
+    transition: background-color 0.3s;
   }
   button:hover {
-    transform: scale(1.05);
-    background-color: #2e59d9;
+    background-color: #45a049;
   }
-  .hidden {
-    display: none;
+  .team-title {
+    font-size: 2rem;
+    font-weight: bold;
+    animation: breathe 2s ease-in-out infinite;
   }
-  .result {
-    font-size: 1.2rem;
-    margin-top: 20px;
-    min-height: 2em;
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
   }
-  .shuffling {
-    animation: shuffle 0.1s infinite;
-    color: #555;
-  }
-  @keyframes shuffle {
-    0% { opacity: 0.2; }
-    50% { opacity: 1; }
-    100% { opacity: 0.2; }
+  .random-words {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-top: 15px;
+    min-height: 50px;
   }
 </style>
 </head>
 <body>
-<div class="container">
-  <h1 id="question">당신은 누구십니까?<br>아래에서 선택해주세요</h1>
-  <div class="button-grid" id="buttonGrid"></div>
-  <div class="result hidden" id="result"></div>
+
+<h1 id="question">당신은 누구십니까?<br>아래에서 선택해주세요</h1>
+<div class="buttons" id="buttons"></div>
+
+<div id="result" style="display:none;">
+  <div id="teamTitle" class="team-title"></div>
+  <div id="randomWords" class="random-words"></div>
 </div>
 
 <script>
-  const names = ["공주", "상준", "쿙냐뮬", "교규먀", "바위게", "젬미니"];
-  const teamNames = ["불사조팀", "청룡팀"];
+const members = ["교규먀", "공주", "상준", "쿙냐뮬", "철수", "영희"];
+const buttonsContainer = document.getElementById("buttons");
+
+// 버튼 랜덤 배치
+function shuffle(array) {
+  return array.sort(() => Math.random() - 0.5);
+}
+function renderButtons() {
+  buttonsContainer.innerHTML = "";
+  shuffle(members).forEach(name => {
+    const btn = document.createElement("button");
+    btn.textContent = name;
+    btn.onclick = () => selectMember(name);
+    buttonsContainer.appendChild(btn);
+  });
+}
+renderButtons();
+
+// 팀 고정 규칙
+function getTeam(name) {
+  if (name === "교규먀" || name === "공주") return "불사조팀";
+  if (name === "상준" || name === "쿙냐뮬") return "청룡팀";
+  return Math.random() < 0.5 ? "불사조팀" : "청룡팀";
+}
+
+function selectMember(name) {
+  document.getElementById("question").style.display = "none";
+  buttonsContainer.style.display = "none";
+  const resultDiv = document.getElementById("result");
+  resultDiv.style.display = "block";
   
-  function shuffleArray(arr) {
-    return arr.sort(() => Math.random() - 0.5);
-  }
+  const teamTitle = document.getElementById("teamTitle");
+  teamTitle.textContent = `${name}님의 팀은...`;
+  
+  const randomWordsEl = document.getElementById("randomWords");
+  const randomPool = ["🔥불사조", "🐉청룡", "🌟별빛", "⚡번개", "🌊파도", "🍀행운", "🦅독수리", "🐯호랑이"];
+  
+  let count = 0;
+  const interval = setInterval(() => {
+    const word = randomPool[Math.floor(Math.random() * randomPool.length)];
+    const color = "#" + Math.floor(Math.random()*16777215).toString(16);
+    randomWordsEl.textContent = word;
+    randomWordsEl.style.color = color;
+    count++;
+  }, 100);
 
-  function createButtons() {
-    const grid = document.getElementById("buttonGrid");
-    grid.innerHTML = "";
-    const shuffledNames = shuffleArray([...names]);
-    shuffledNames.forEach(name => {
-      const btn = document.createElement("button");
-      btn.textContent = name;
-      btn.addEventListener("click", () => handleSelection(name));
-      grid.appendChild(btn);
-    });
-  }
-
-  function handleSelection(selectedName) {
-    document.getElementById("question").classList.add("hidden");
-    document.getElementById("buttonGrid").classList.add("hidden");
-    const resultDiv = document.getElementById("result");
-    resultDiv.classList.remove("hidden");
-    resultDiv.innerHTML = `${selectedName}님의 팀은... <span class="shuffling" id="shufflingText"></span>`;
-
-    const words = ["호랑이팀", "용사팀", "태양팀", "달빛팀", "은하팀", "바람팀"];
-    let shuffleIndex = 0;
-    const shuffleInterval = setInterval(() => {
-      document.getElementById("shufflingText").textContent = words[shuffleIndex % words.length];
-      shuffleIndex++;
-    }, 100);
-
-    setTimeout(() => {
-      clearInterval(shuffleInterval);
-      let finalTeam;
-      if (["교규먀", "공주"].includes(selectedName)) {
-        finalTeam = "불사조팀";
-      } else if (["상준", "쿙냐뮬"].includes(selectedName)) {
-        finalTeam = "청룡팀";
-      } else {
-        finalTeam = Math.random() > 0.5 ? "불사조팀" : "청룡팀";
-      }
-      document.getElementById("shufflingText").classList.remove("shuffling");
-      document.getElementById("shufflingText").textContent = finalTeam;
-    }, 3500);
-  }
-
-  createButtons();
+  setTimeout(() => {
+    clearInterval(interval);
+    randomWordsEl.style.color = "#000";
+    randomWordsEl.textContent = getTeam(name);
+  }, 3500);
+}
 </script>
+
 </body>
 </html>
-
