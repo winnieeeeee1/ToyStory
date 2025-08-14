@@ -3,123 +3,123 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>온라인 친구들과 여름나기</title>
+<title>팀 배정</title>
 <style>
-  body {
-    font-family: 'Arial', sans-serif;
-    background-color: #fefefe;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    flex-direction: column;
-    text-align: center;
-  }
-  h1 {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-  }
-  .buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    width: 80%;
-    max-width: 400px;
-  }
-  button {
-    padding: 15px;
-    font-size: 1rem;
-    border: none;
-    background-color: #4CAF50;
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  button:hover {
-    background-color: #45a049;
-  }
-  .team-title {
-    font-size: 2rem;
-    font-weight: bold;
-    animation: breathe 2s ease-in-out infinite;
-  }
-  @keyframes breathe {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.15); }
-  }
-  .random-words {
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin-top: 15px;
-    min-height: 50px;
-  }
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f0f0f0;
+        overflow: hidden;
+    }
+    h1 {
+        font-size: 1.5em;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    .button-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        width: 80%;
+    }
+    button {
+        padding: 15px;
+        font-size: 1em;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        background-color: #4CAF50;
+        color: white;
+        transition: background-color 0.3s;
+    }
+    button:hover {
+        background-color: #45a049;
+    }
+    .hidden {
+        display: none;
+    }
+    .result-container {
+        text-align: center;
+    }
+    .team-text {
+        font-size: 2em;
+        font-weight: bold;
+        animation: breathe 2s infinite ease-in-out;
+    }
+    @keyframes breathe {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+    .random-words {
+        margin-top: 20px;
+        font-size: 2.5em;
+        font-weight: bold;
+        height: 60px;
+    }
 </style>
 </head>
 <body>
 
-<h1 id="question">당신은 누구십니까?<br>아래에서 선택해주세요</h1>
-<div class="buttons" id="buttons"></div>
+<div id="main-container">
+    <h1>당신은 누구십니까?<br>아래에서 선택해주세요</h1>
+    <div class="button-container" id="buttons"></div>
+</div>
 
-<div id="result" style="display:none;">
-  <div id="teamTitle" class="team-title"></div>
-  <div id="randomWords" class="random-words"></div>
+<div id="result" class="result-container hidden">
+    <div id="team-text" class="team-text"></div>
+    <div id="random-words" class="random-words"></div>
 </div>
 
 <script>
-const members = ["교규먀", "공주", "상준", "쿙냐뮬", "바위게", "젬미니", "윤개", "여신", "주디"];
-const buttonsContainer = document.getElementById("buttons");
+    const players = ["교규먀", "공주", "상준", "쿙냐뮬", "철수", "영희"];
 
-// 버튼 랜덤 배치
-function shuffle(array) {
-  return array.sort(() => Math.random() - 0.5);
-}
-function renderButtons() {
-  buttonsContainer.innerHTML = "";
-  shuffle(members).forEach(name => {
-    const btn = document.createElement("button");
-    btn.textContent = name;
-    btn.onclick = () => selectMember(name);
-    buttonsContainer.appendChild(btn);
-  });
-}
-renderButtons();
+    function shuffle(array) {
+        return array.sort(() => Math.random() - 0.5);
+    }
 
-// 팀 고정 규칙
-function getTeam(name) {
-  if (name === "교규먀" || name === "공주") return "불사조팀";
-  if (name === "상준" || name === "쿙냐뮬") return "청룡팀";
-  return Math.random() < 0.5 ? "불사조팀" : "청룡팀";
-}
+    function assignTeam(name) {
+        // 고정 규칙
+        if (name === "교규먀" || name === "공주") return "불사조팀";
+        if (name === "상준" || name === "쿙냐뮬") return "청룡팀";
+        // 나머지 랜덤
+        return Math.random() < 0.5 ? "불사조팀" : "청룡팀";
+    }
 
-function selectMember(name) {
-  document.getElementById("question").style.display = "none";
-  buttonsContainer.style.display = "none";
-  const resultDiv = document.getElementById("result");
-  resultDiv.style.display = "block";
-  
-  const teamTitle = document.getElementById("teamTitle");
-  teamTitle.textContent = `${name}님의 팀은...`;
-  
-  const randomWordsEl = document.getElementById("randomWords");
-  const randomPool = ["🔥불사조", "🐉청룡", "🌟별빛", "⚡번개", "🌊파도", "🍀행운", "🦅독수리", "🐯호랑이"];
-  
-  let count = 0;
-  const interval = setInterval(() => {
-    const word = randomPool[Math.floor(Math.random() * randomPool.length)];
-    const color = "#" + Math.floor(Math.random()*16777215).toString(16);
-    randomWordsEl.textContent = word;
-    randomWordsEl.style.color = color;
-    count++;
-  }, 100);
+    function showResult(name) {
+        document.getElementById("main-container").classList.add("hidden");
+        document.getElementById("result").classList.remove("hidden");
 
-  setTimeout(() => {
-    clearInterval(interval);
-    randomWordsEl.style.color = "#000";
-    randomWordsEl.textContent = getTeam(name);
-  }, 3500);
-}
+        document.getElementById("team-text").textContent = `${name}님의 팀은...`;
+
+        const randomWordsDiv = document.getElementById("random-words");
+        let colors = ["red", "blue", "green", "orange", "purple", "teal"];
+        let words = ["호랑이", "용", "불꽃", "바람", "바다", "구름", "태양", "별빛"];
+
+        let interval = setInterval(() => {
+            randomWordsDiv.textContent = words[Math.floor(Math.random() * words.length)];
+            randomWordsDiv.style.color = colors[Math.floor(Math.random() * colors.length)];
+        }, 100);
+
+        setTimeout(() => {
+            clearInterval(interval);
+            randomWordsDiv.textContent = assignTeam(name);
+            randomWordsDiv.style.color = "black";
+        }, 3500);
+    }
+
+    // 버튼 생성
+    const buttonContainer = document.getElementById("buttons");
+    shuffle(players).forEach(name => {
+        const btn = document.createElement("button");
+        btn.textContent = name;
+        btn.onclick = () => showResult(name);
+        buttonContainer.appendChild(btn);
+    });
 </script>
 
 </body>
